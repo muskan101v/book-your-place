@@ -11,21 +11,90 @@ export class PlaceService {
       'Taj Mahal',
       'Symbol of Love',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6d3mi2QcgaFCwWRoU3wiDTlvIRYS4TyPhYA&usqp=CAU',
-      160.99
+      160.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
     ),
     new Place(
       'p2',
-      'L\'Amour Toujours',
+      'L Amour Toujours',
       'A romantic place in paris!',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZ6T4IZhHJAPu4F2b0ENT0FwHSUCDdnmbwkA&usqp=CAU',
-      149.99
+      149.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
     ),
     new Place(
       'p3',
       'Eiffel Tower',
       'Lover Point!',
       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
-      150.99
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p4',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p5',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p6',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p7',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p8',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p9',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
+    ),
+    new Place(
+      'p10',
+      'Eiffel Tower',
+      'Lover Point!',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+      150.99,
+      new Date('2022-01-01'),
+      new Date('2022-12-31')
     ),
   ];
   constructor() {}

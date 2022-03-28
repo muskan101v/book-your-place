@@ -1,5 +1,9 @@
+/* eslint-disable max-len */
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
+import { PlaceService } from '../../place.service';
 
 @Component({
   selector: 'app-new-offer',
@@ -8,7 +12,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class NewOfferPage implements OnInit {
   newOfferForm;
-  constructor() {}
+  constructor(
+    private readonly placeService: PlaceService,
+    private readonly router: Router,
+    private loadingCtrl: LoadingController
+  ) {}
 
   ngOnInit() {
     this.createForm();
@@ -39,10 +47,29 @@ export class NewOfferPage implements OnInit {
     });
   }
   onCreateOffer() {
-    if (!this.newOfferForm) {
+    if (!this.newOfferForm.valid) {
       return;
     } else {
-      console.log(this.newOfferForm);
+      this.loadingCtrl
+        .create({
+          message: 'Creating place...',
+        })
+        .then((loadingEl) => {
+          loadingEl.present();
+          this.placeService
+            .addPlace(
+              this.newOfferForm.value.title,
+              this.newOfferForm.value.shortDescription,
+              this.newOfferForm.value.price,
+              this.newOfferForm.value.dateFrom,
+              this.newOfferForm.value.dateTo
+            )
+            .subscribe(() => {
+              loadingEl.dismiss();
+              this.newOfferForm.reset();
+              this.router.navigate(['/', 'page', 'tabs', 'offers']);
+            });
+        });
     }
   }
 }

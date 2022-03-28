@@ -11,25 +11,43 @@
 </ion-header>
 
 <ion-content>
-  <ion-segment (ionChange)="onFilterChange($event)" value="all">
+  <ion-segment (ionChange)="onFilterUpdate($event)" value="all">
     <ion-segment-button value="all">All Places</ion-segment-button>
     <ion-segment-button value="bookable">Bookable Places</ion-segment-button>
   </ion-segment>
   <ion-grid>
     <ion-row>
       <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+        <div *ngIf="isLoading" class="ion-text-center">
+          <ion-spinner color="primary"></ion-spinner>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="!isLoading && (!relvantPlaces ||relvantPlaces.length<=0)">
+    <ion-row>
+      <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
+        <p>There is no bookable places right now ,please comeback later!</p>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+  <ion-grid *ngIf="!isLoading && relvantPlaces.length>0">
+    <ion-row>
+      <ion-col size="12" size-sm="8" offset-sm="2" class="ion-text-center">
         <ion-card class="ion-no-padding">
           <ion-card-header>
-            <ion-card-title>{{loadedPlace[0].title}}</ion-card-title>
-            <ion-card-subtitle>{{loadedPlace[0].price}}</ion-card-subtitle>
+            <ion-card-title>{{relvantPlaces[0].title}}</ion-card-title>
+            <ion-card-subtitle>{{relvantPlaces[0].price}}</ion-card-subtitle>
           </ion-card-header>
-          <ion-img [src]="loadedPlace[0].imageUrl"></ion-img>
-          <ion-card-content> {{loadedPlace[0].description}} </ion-card-content>
+          <ion-img [src]="relvantPlaces[0].imageUrl"></ion-img>
+          <ion-card-content>
+            {{relvantPlaces[0].description}}
+          </ion-card-content>
           <div>
             <ion-button
               fill="clear"
               color="primary"
-              [routerLink]="['/','page','tabs','discover',loadedPlace[0].id]"
+              [routerLink]="['/','page','tabs','discover',relvantPlaces[0].id]"
               >More</ion-button
             >
           </div>

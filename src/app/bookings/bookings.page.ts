@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { IonItemSliding } from '@ionic/angular';
-import { Boooking } from './booking.model';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { IonItemSliding, LoadingController } from '@ionic/angular';
+import { Subscription } from 'rxjs';
+import { Booking } from './booking.model';
 import { BookingService } from './booking.service';
 
 @Component({
@@ -8,18 +9,45 @@ import { BookingService } from './booking.service';
   templateUrl: './bookings.page.html',
   styleUrls: ['./bookings.page.scss'],
 })
-export class BookingsPage implements OnInit {
-  loadingBooking: Boooking[];
-  constructor(private readonly booking: BookingService) {}
+export class BookingsPage implements OnInit, OnDestroy {
+  loadingBooking: Booking[];
+  bookSub: Subscription;
+  loaadedbook = false;
+  isLoading = false;
+  constructor(
+    private readonly booking: BookingService,
+    private loader: LoadingController
+  ) {}
 
   ngOnInit() {
-    this.getBooking();
+    this.bookSub = this.booking.bookings.subscribe((bookings) => {
+      this.loadingBooking = bookings;
+    });
   }
-  getBooking() {
-    this.loadingBooking = this.booking.getBooking();
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.booking.fetchbooking().subscribe(() => {
+      this.isLoading = false;
+    });
   }
+
   onCancelBooking(bookingId, slidingItem: IonItemSliding) {
     slidingItem.close();
-    console.log(bookingId);
+    this.loader
+      .create({ message: 'Cancelation in process !' })
+      .then((loadingEl) => {
+        loadingEl.present();
+        this.booking.cancelBooking(bookingId).subscribe((res) => {
+          console.log(res);
+          loadingEl.dismiss();
+        });
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.bookSub) {
+      this.bookSub.unsubscribe();
+    }
   }
 }

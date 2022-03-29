@@ -18,39 +18,47 @@ export class BookingService {
   }
 
   fetchbooking() {
-    return this.http
-      .get(
-        `https://book-a-place-1fa1b-default-rtdb.firebaseio.com/bookings.json?orderBy="userId"&equalTo="${this.authService.userID}"`
-      )
-      .pipe(
-        map((resData) => {
-          const bookings = [];
-          for (const key in resData) {
-            if (resData.hasOwnProperty(key)) {
-              bookings.push(
-                new Booking(
-                  key,
-                  resData[key].placeId,
-                  resData[key].userId,
-                  resData[key].placeTitle,
-                  resData[key].placeImage,
-                  resData[key].firstName,
-                  resData[key].lastName,
-                  resData[key].guestNumber,
-                  new Date(resData[key].bookedFrom),
-                  new Date(resData[key].bookedTo)
-                )
-              );
-            }
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap((userId) => {
+        console.log(userId);
+        if (!userId) {
+          throw new Error('No user found!');
+        }
+        return this.http.get(
+          `https://book-a-place-1fa1b-default-rtdb.firebaseio.com/bookings.json?orderBy="userId"&equalTo="${userId}"`
+        );
+      }),
+      map((resData) => {
+        console.log(resData);
+        const bookings = [];
+        for (const key in resData) {
+          if (resData.hasOwnProperty(key)) {
+            bookings.push(
+              new Booking(
+                key,
+                resData[key].placeId,
+                resData[key].userId,
+                resData[key].placeTitle,
+                resData[key].placeImage,
+                resData[key].firstName,
+                resData[key].lastName,
+                resData[key].guestNumber,
+                new Date(resData[key].bookedFrom),
+                new Date(resData[key].bookedTo)
+              )
+            );
           }
-          return bookings;
-          // return [];
-        }),
-        tap((places) => {
-          this._bookings.next(places);
-        })
-      );
+        }
+        return bookings;
+        // return [];
+      }),
+      tap((places) => {
+        this._bookings.next(places);
+      })
+    );
   }
+
   addBooking(
     placeId: string,
     placeTitle: string,
@@ -61,36 +69,43 @@ export class BookingService {
     dateFrom: Date,
     dateTo: Date
   ) {
-    const newBooking = new Booking(
-      Math.random().toString(),
-      placeId,
-      this.authService.userId,
-      placeTitle,
-      placeImage,
-      firstName,
-      lastName,
-      guestNumber,
-      dateFrom,
-      dateTo
-    );
     let generatedId: string;
-    return this.http
-      .post<{ name: string }>(
-        'https://book-a-place-1fa1b-default-rtdb.firebaseio.com/bookings.json',
-        { ...newBooking, id: null }
-      )
-      .pipe(
-        switchMap((resData) => {
-          generatedId = resData.name;
-          return this.bookings;
-        }),
-        take(1),
-        tap((res) => {
-          newBooking.id = generatedId;
-          this._bookings.next(res.concat(newBooking));
-        })
-      );
+    let newBooking: Booking;
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap((userId) => {
+        if (!userId) {
+          throw new Error('No user id found!');
+        }
+        newBooking = new Booking(
+          Math.random().toString(),
+          placeId,
+          userId,
+          placeTitle,
+          placeImage,
+          firstName,
+          lastName,
+          guestNumber,
+          dateFrom,
+          dateTo
+        );
+        return this.http.post<{ name: string }>(
+          'https://book-a-place-1fa1b-default-rtdb.firebaseio.com/bookings.json',
+          { ...newBooking, id: null }
+        );
+      }),
+      switchMap((resData) => {
+        generatedId = resData.name;
+        return this.bookings;
+      }),
+      take(1),
+      tap((bookings) => {
+        newBooking.id = generatedId;
+        this._bookings.next(bookings.concat(newBooking));
+      })
+    );
   }
+
   cancelBooking(id: string) {
     return this.http
       .delete(

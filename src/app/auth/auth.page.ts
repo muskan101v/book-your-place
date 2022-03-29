@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import { AuthService } from './auth.service';
+import { AlertController, LoadingController } from '@ionic/angular';
+import { Observable } from 'rxjs';
+import { AuthResponseData, AuthService } from './auth.service';
 
 @Component({
   selector: 'app-auth',
@@ -13,30 +14,16 @@ export class AuthPage implements OnInit {
   isLoading = false;
   loginForm;
   islogin = true;
+
   constructor(
     private authService: AuthService,
     private router: Router,
-    private loadingCtrl: LoadingController
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
     this.createForm();
-  }
-
-  onLogin() {
-    this.isLoading = true;
-    this.authService.login();
-    this.loadingCtrl
-      .create({ keyboardClose: true, message: 'Logging in...' })
-      .then((loadingEl) => {
-        loadingEl.present();
-        setTimeout(() => {
-          this.isLoading = false;
-          loadingEl.dismiss();
-          this.router.navigateByUrl('/page/tabs/discover');
-          this.loginForm.reset();
-        }, 1500);
-      });
   }
 
   createForm() {
@@ -54,14 +41,75 @@ export class AuthPage implements OnInit {
     } else {
       const email = this.loginForm.value.email;
       const password = this.loginForm.value.password;
-      if (!this.islogin) {
-      } else {
-        this.onLogin();
-        console.log(this.loginForm);
-      }
+      this.authenticate(email, password);
     }
   }
+  authenticate(email, pass) {
+    this.isLoading = true;
+    this.loadingCtrl
+      .create({ keyboardClose: true, message: 'Logging in...' })
+      .then((loadingEl) => {
+        loadingEl.present();
+        let authObs: Observable<AuthResponseData>;
+        if (!this.islogin) {
+          authObs = this.authService.createUser(email, pass);
+        } else {
+          authObs = this.authService.login(email, pass);
+        }
+        authObs.subscribe(
+          (res) => {
+            loadingEl.dismiss();
+            if (!this.islogin) {
+              this.router.navigate(['/', 'auth']);
+              this.islogin = true;
+              let message = 'you have Successfully sign up please login';
+              const header = 'Authentication';
+              this.showAlert(message, header);
+            } else {
+              this.router.navigate(['/', 'page', 'tabs', 'discover']);
+            }
+            this.isLoading = false;
+            this.loginForm.reset();
+          },
+          (error) => {
+            const code = error.error.error.message;
+            const header = 'Authentication failed';
+            let message = 'could not sign you up! please try again.';
+            if (code == 'EMAIL_EXISTS') {
+              message = 'This email already exists';
+            } else if (code == 'EMAIL_NOT_FOUND') {
+              message = 'This email not found';
+            } else if (code == 'INVALID_PASSWORD') {
+              message = 'This password is incorrect!';
+            }
+            this.isLoading = false;
+            loadingEl.dismiss();
+            this.showAlert(message, header);
+          }
+        );
+      });
+  }
+
   onSwitchUser() {
     this.islogin = !this.islogin;
+  }
+
+  private showAlert(errorMessage, header) {
+    this.alertCtrl
+      .create({
+        header: header,
+        message: errorMessage,
+        buttons: [
+          {
+            text: 'okay',
+            handler: () => {
+              this.router.navigate(['/auth']);
+            },
+          },
+        ],
+      })
+      .then((alertEl) => {
+        alertEl.present();
+      });
   }
 }

@@ -5,58 +5,65 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <ion-grid>
-      <ion-row>
-        <ion-col size-sm="4" offset-sm="4">
-          <ion-list>
-            <ion-item>
-              <ion-label position="floating">E-Mail</ion-label>
-              <ion-input type="email" formControlName="email"></ion-input>
-            </ion-item>
-            <ion-item
-              lines="none"
-              *ngIf="!loginForm.controls.email.valid && loginForm.controls.email.touched"
-            >
-              <ion-label> Enter email should be valid! </ion-label>
-            </ion-item>
+  <ion-grid>
+    <ion-row>
+      <ion-col size-sm="12">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <ion-row>
+            <ion-col size-sm="4">
+              <ion-list>
+                <ion-item>
+                  <ion-label position="floating">E-Mail</ion-label>
+                  <ion-input type="email" formControlName="email"></ion-input>
+                </ion-item>
+                <ion-item
+                  lines="none"
+                  *ngIf="!loginForm.controls.email.valid && loginForm.controls.email.touched"
+                >
+                  <p>Enter email should be valid!</p>
+                </ion-item>
 
-            <ion-item>
-              <ion-label position="floating">Password</ion-label>
-              <ion-input type="password" formControlName="password"></ion-input>
-            </ion-item>
-            <ion-item
-              lines="none"
-              *ngIf="!loginForm.controls.password.valid && loginForm.controls.password.touched"
-            >
-              <ion-label> Password should be at least 6 character</ion-label>
-            </ion-item>
-          </ion-list>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col size-sm="4" offset-sm="4">
-          <ion-button
-            color="primary"
-            fill="clear"
-            expand="block"
-            type="button"
-            (click)="onSwitchUser()"
-          >
-            Switch to {{islogin ? 'SignUp' :'Login'}}
-          </ion-button>
-          <ion-button
-            color="primary"
-            type="submit"
-            expand="block"
-            [disabled]="loginForm.invalid"
-          >
-            {{!islogin ? 'Sign Up' :'login'}}
-          </ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-  </form>
+                <ion-item>
+                  <ion-label position="floating">Password</ion-label>
+                  <ion-input
+                    type="password"
+                    formControlName="password"
+                  ></ion-input>
+                </ion-item>
+                <ion-item
+                  lines="none"
+                  *ngIf="!loginForm.controls.password.valid && loginForm.controls.password.touched"
+                >
+                  <p>Password should be at least 6 character</p>
+                </ion-item>
+              </ion-list>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size-sm="4">
+              <ion-button
+                color="primary"
+                fill="clear"
+                expand="block"
+                type="button"
+                (click)="onSwitchUser()"
+              >
+                Switch to {{islogin ? 'SignUp':'Login'}}
+              </ion-button>
+              <ion-button
+                color="primary"
+                type="submit"
+                expand="block"
+                [disabled]="loginForm.invalid"
+              >
+                {{islogin ?'Login':'SignUp'}}
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 
   <!-- <div class="ion-text-center">
     <ion-spinner

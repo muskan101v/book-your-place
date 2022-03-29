@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export class Booking {
   constructor(
     public id: string,

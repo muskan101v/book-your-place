@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Place } from './place.model';
 import { delay, map, switchMap, take, tap } from 'rxjs/operators';
@@ -95,33 +95,39 @@ export class PlaceService {
     availableTo: Date
   ) {
     let generatedId: string;
-    const newplace = new Place(
-      Math.random().toString(),
-      title,
-      description,
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
-      price,
-      availableFrom,
-      availableTo,
-      this.authService.userID
+    let newplace: Place;
+    return this.authService.userId.pipe(
+      take(1),
+      switchMap((userId) => {
+        if (!userId) {
+          throw new Error('No user found!');
+        }
+        newplace = new Place(
+          Math.random().toString(),
+          title,
+          description,
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS0Y9Nkcsjf6o_4EOZD0Hb2klwHnL8y_Lh1Pw&usqp=CAU',
+          price,
+          availableFrom,
+          availableTo,
+          userId
+        );
+        return this.http.post<{ name: string }>(
+          'https://book-a-place-1fa1b-default-rtdb.firebaseio.com/offered-places.json',
+          { ...newplace, id: null }
+        );
+      }),
+      switchMap((resData) => {
+        console.log(resData);
+        generatedId = resData.name;
+        return this.places;
+      }),
+      take(1),
+      tap((places) => {
+        newplace.id = generatedId;
+        this._places.next(places.concat(newplace));
+      })
     );
-    return this.http
-      .post<{ name: string }>(
-        'https://book-a-place-1fa1b-default-rtdb.firebaseio.com/offered-places.json',
-        { ...newplace, id: null }
-      )
-      .pipe(
-        switchMap((resData) => {
-          console.log(resData);
-          generatedId = resData.name;
-          return this.places;
-        }),
-        take(1),
-        tap((places) => {
-          newplace.id = generatedId;
-          this._places.next(places.concat(newplace));
-        })
-      );
   }
 
   updatePlace(placeId: string, title: string, description: string) {

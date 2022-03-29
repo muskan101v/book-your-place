@@ -40,16 +40,17 @@ export class DiscoverPage implements OnInit, OnDestroy {
   //   this.menuCtrl.toggle();
   // }
   onFilterUpdate(event) {
-    if (event.detail.value === 'all') {
-      this.relvantPlaces = this.loadedPlaces;
-      this.listedLoadedPlaces = this.relvantPlaces.slice(1);
-    } else {
-      this.relvantPlaces = this.loadedPlaces.filter(
-        (place) => place.userId !== this.authService.userId
-      );
-
-      this.listedLoadedPlaces = this.relvantPlaces.slice(1);
-    }
+    this.authService.userId.subscribe((userId) => {
+      if (event.detail.value === 'all') {
+        this.relvantPlaces = this.loadedPlaces;
+        this.listedLoadedPlaces = this.relvantPlaces.slice(1);
+      } else {
+        this.relvantPlaces = this.loadedPlaces.filter(
+          (place) => place.userId !== userId
+        );
+        this.listedLoadedPlaces = this.relvantPlaces.slice(1);
+      }
+    });
   }
   ngOnDestroy() {
     if (this.placesSub) {

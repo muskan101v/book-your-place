@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export class Place {
   constructor(
     public id: string,

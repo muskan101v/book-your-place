@@ -8,6 +8,7 @@ import {
   NavController,
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
+import { switchMap, take } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/auth.service';
 import { BookingService } from 'src/app/bookings/booking.service';
 import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-booking.component';
@@ -38,18 +39,27 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.isLoading = true;
     this.route.paramMap.subscribe((paramMap) => {
       if (!paramMap.has('placeId')) {
         this.navCtrl.navigateBack('/places/tabs/discover');
         return;
       }
-      this.placeSub = this.placesService
-        .getPlace(paramMap.get('placeId'))
+      let fetchedUserId: string;
+      this.authService.userId
+        .pipe(
+          take(1),
+          switchMap((userId) => {
+            if (!userId) {
+              throw new Error('Found no user!');
+            }
+            fetchedUserId = userId;
+            return this.placesService.getPlace(paramMap.get('placeId'));
+          })
+        )
         .subscribe(
           (res) => {
             this.place = res;
-            this.isbookable = this.place.userId !== this.authService.userID;
+            this.isbookable = this.place.userId !== fetchedUserId;
             this.isLoading = false;
           },
           (error) => {
@@ -116,6 +126,8 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
         return modalEl.onDidDismiss();
       })
       .then((resultData) => {
+        console.log(resultData);
+
         if (resultData.role === 'confirm') {
           this.loaderCtrl
             .create({ message: 'Booking place...' })
